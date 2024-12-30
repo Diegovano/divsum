@@ -1,0 +1,12 @@
+{
+  "name": "divsum",
+  "version": "0.1.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Diego Van Overberghe",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
