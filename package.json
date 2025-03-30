@@ -1,12 +1,46 @@
 {
   "name": "divsum",
   "version": "0.1.0",
-  "description": "",
-  "license": "ISC",
-  "author": "Diego Van Overberghe",
-  "type": "commonjs",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "cd frontend && vite",
+    "frontend:build": "cd frontend && webpack --config webpack.config.js",
+    "backend:build": "tsc backend/index.ts --outDir dist/backend",
+    "lint": "eslint .",
+    "preview": "cd frontend && vite preview"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "express": "^4.21.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-react": "^7.26.3",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.14",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-react": "^7.37.3",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "globals": "^15.14.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "nodemon": "^3.1.9",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.0.5",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
   }
 }
