@@ -1,6 +1,7 @@
 {
   "name": "divsum",
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "dev": "cd frontend && vite",
     "frontend:build": "cd frontend && webpack --config webpack.config.js",

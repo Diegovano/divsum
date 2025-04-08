@@ -9,7 +9,7 @@ import { FlatCompat } from '@eslint/eslintrc';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ['**/*.{ts,tsx}'] },
+  { files: ['**/**/*.{ts,tsx}'] },
   // { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,

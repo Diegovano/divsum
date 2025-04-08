@@ -1,7 +1,9 @@
 
 {
   "compilerOptions": {
-    "outDir": "../dist/backend"
+    "outDir": "../dist/backend",
+    "target": "es6",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["index.ts"]
 }

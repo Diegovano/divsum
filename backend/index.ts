@@ -1,68 +1,77 @@
-// // import * as sql from 'better-sqlite3';
-// import * as express from 'express';
-// import path from 'path';
+import express from 'express';
+import path from 'path';
+import sql from 'better-sqlite3';
 
-// const app = express();
-// const port = 3000;
-
-// // const db = sql('foobar.db', { verbose: console.log });
-
-// app.use(express.json());
-// app.use(express.static('public'));
-// app.use(express.static('build'));
-
-// app.get('/', (_req, res) => {
-//   // res.send('Hello World!');
-//   // res.send(db.serialize().toLocaleString())
-//   res.sendFile(path.join(__dirname, '/../frontend/dist/index.html'), err => {
-//     if (err) {
-//       res.status(500).send(err);
-//     }
-//   });
-// });
-
-// // app.get('/append', (req, res) => {
-// //   if (req.query.id) db.prepare('INSERT INTO transaction (value) VALUES (?)').run(req.query.id);
-// // });
-
-// // interface userProfile {
-// //   userId: number,
-// //   firstName: string,
-// //   lastName: string,
-// //   email: string
-// // }
-
-// app.listen(port, () => {
-//   console.log(`Example app listening on port ${port}`);
-
-//   // const userId = 5;
-
-//   // const row = db.prepare<userProfile['userId'], userProfile>('SELECT * FROM users WHERE id = ?').get(userId);
-//   // console.log(row.firstName, row.lastName, row.email);
-// });
-
-import * as express from 'express';
-import * as path from 'path';
+const __dirname = import.meta.dirname;
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+const db = sql('foobar.db', { verbose: console.log });
+
 app.listen(port, () => {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS people (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS groups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    )
+  `);
+  // db.exec("INSERT INTO people (name) VALUES ('Alice')");
   console.log(`The app server is running on port: ${port}`);
 });
 
-const DIST_DIR = path.join(__dirname, '..', 'frontend');
-const HTML_FILE = path.join(DIST_DIR, 'index.html');
+const DIST_DIR = path.join(__dirname, '..', 'dist', 'frontend');
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend/public')));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(DIST_DIR));
 
-app.get('/', (req, res) => {
+app.get('/db', (req, res) => {
   console.log(`req: ${req.url}`);
-  res.sendFile(HTML_FILE, err => {
-    if (err) {
-      res.status(500).send(err);
+  // res.send(db.serialize().toLocaleString());
+  try {
+    // Get all user tables (excluding SQLite internal tables)
+    const tables = db.prepare(`
+      SELECT name FROM sqlite_master 
+      WHERE type='table' AND name NOT LIKE 'sqlite_%';
+    `).all() as { name: string}[];
+
+    const dbJson: Record<string, unknown[]> = {};
+
+    for (const { name } of tables) {
+      const rows = db.prepare(`SELECT * FROM ${name};`).all();
+      dbJson[name] = rows;
     }
-  });
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(dbJson, null, 2));
+  } catch (err) {
+    console.error('Error serializing DB to JSON:', err);
+    res.status(500).json({ error: 'Failed to serialize database' });
+  }
+});
+
+app.get('/people', (req, res) => {
+  const peopleNameRecords = db.prepare("SELECT name from 'people'").all() as { name: string }[];
+  const peopleNames = peopleNameRecords.map(record => record.name);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(peopleNames, null, 2));
+});
+
+app.get('/groups', (_req, res) => {
+  const groupNameRecords = db.prepare("SELECT name from 'groups'").all() as { name: string }[];
+  const groupNames = groupNameRecords.map(record => record.name);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(groupNames, null, 2));
+});
+
+app.post('/newGroup', (req, res) => {
+  if (req.body?.name) {
+    db.exec(`INSERT INTO 'groups' (name) VALUES ('${req.body.name}')`);
+  }
+  res.send('POST received at server!');
 });
